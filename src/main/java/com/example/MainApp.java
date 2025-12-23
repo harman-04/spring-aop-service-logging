@@ -4,15 +4,19 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 
 import com.example.config.AppConfig;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 // Main class
 public class MainApp {
     static void main() {
 
         // Create and initialize the context using the Java-based configuration
+        // Option A: Annotation-Based (Modern)
+//        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
 
-        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
 
+        // Option B: XML-Based (Legacy)
+        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("aop-config.xml");
 
         // Retrieving the EmployeeService bean from the Spring Container
         EmployeeService service = context.getBean(EmployeeService.class);

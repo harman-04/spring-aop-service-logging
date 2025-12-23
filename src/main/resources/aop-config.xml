@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+    <bean id="employeeService" class="com.example.service.EmployeeService"/>
+    <bean id="loggingAspect" class="com.example.aspect.EmployeeAspect" />
+
+    <aop:config>
+        <aop:aspect id="myAspect" ref="loggingAspect" >
+            <aop:pointcut id="serviceOps" expression="execution(* com.example.service.EmployeeService.*(..))"/>
+
+            <aop:before method="logBefore" pointcut-ref="serviceOps" />
+            <aop:after method="logAfter" pointcut-ref="serviceOps"/>
+            <aop:after-returning method="logAfterReturning" pointcut-ref="serviceOps" returning="result"/>
+            <aop:after-throwing method="logAfterThrowing" pointcut-ref="serviceOps" throwing="error"/>
+            <aop:around method="logAround" pointcut-ref="serviceOps" />
+        </aop:aspect>
+    </aop:config>
+</beans>

@@ -9,10 +9,14 @@ This project demonstrates Aspect-Oriented Programming (AOP) using Spring 6 and A
 
 ## Technical Specifications
 
-### 1. AspectJ Integration
+### 1. AOP Implementation Styles
+* **Annotation-Based**: Uses `@Aspect` and `@Before/@After` annotations directly within Java classes for fast development and high readability.
+* **XML-Based**: Uses `<aop:config>` in an external XML file to map advice to business logic, allowing for a strict separation of concerns without modifying Java source code.
+
+### 2. AspectJ Integration
 The project uses `aspectjweaver` to enable proxy-based AOP. The `@EnableAspectJAutoProxy` annotation in the configuration class tells Spring to create proxies for beans that match specified pointcuts.
 
-### 2. Advice Types Implemented
+### 3. Advice Types Implemented
 
 * **@Before**: Executes before the target method starts. Used for initial logging or security checks.
 * **@After**: Executes regardless of whether the method succeeds or fails (similar to a finally block).
@@ -34,7 +38,7 @@ The project uses `aspectjweaver` to enable proxy-based AOP. The `@EnableAspectJA
 * **Note**: This class remains completely clean of logging code. It is unaware that an Aspect is watching it.
 
 ### EmployeeAspect.java
-* **Purpose**: Centralized logging module.
+* **Purpose**: Centralized logging module. In XML mode, Spring ignores the annotations and uses the raw methods (`logBefore`, `logAround`, etc.) by their names.
 * **Pointcut Expression**: `execution(* com.example.service.*.*(..))`
     * `*`: Any return type.
     * `com.example.service.*`: Any class in this package.
@@ -43,8 +47,30 @@ The project uses `aspectjweaver` to enable proxy-based AOP. The `@EnableAspectJA
 ### MainApp.java
 * **Purpose**: Entry point that initializes `AnnotationConfigApplicationContext` and triggers the service methods to demonstrate AOP in action.
 
+### app-config.xml (XML Approach)
+* **Purpose**: Declarative AOP configuration. It defines beans and maps method names to pointcut expressions.
+* **Key Tags**:
+    * `<aop:aspectj-autoproxy />`: Enables AOP support.
+    * `<aop:pointcut>`: Defines a reusable expression for targeting methods.
+    * `<aop:aspect>`: References the Aspect bean and contains the advice mappings.
 
 
+---
+## XML Configuration Details
+To run the project in XML mode, the following configuration is used in `src/main/resources/applicationContext.xml`:
+
+```xml
+<aop:config>
+    <aop:pointcut id="serviceMethods" expression="execution(* com.example.service.*.*(..))" />
+    <aop:aspect id="loggingAspect" ref="employeeAspectBean">
+        <aop:around method="logAround" pointcut-ref="serviceMethods" />
+        <aop:before method="logBefore" pointcut-ref="serviceMethods" />
+        <aop:after method="logAfter" pointcut-ref="serviceMethods" />
+        <aop:after-returning method="logAfterReturning" pointcut-ref="serviceMethods" returning="result" />
+        <aop:after-throwing method="logAfterThrowing" pointcut-ref="serviceMethods" throwing="error" />
+    </aop:aspect>
+</aop:config>
+```
 ---
 
 ## Dependencies (pom.xml)
