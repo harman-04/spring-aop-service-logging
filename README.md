@@ -65,6 +65,19 @@ The project uses `aspectjweaver` to enable proxy-based AOP. The `@EnableAspectJA
 
 ---
 
+## Advice Execution Hierarchy
+
+When multiple advice types are applied to a single method, Spring AOP follows a specific execution order:
+
+1. **@Around (Part 1)**: The code before `joinPoint.proceed()`.
+2. **@Before**: Executes immediately before the method.
+3. **The Target Method**: The actual business logic runs.
+4. **@Around (Part 2)**: The code after `joinPoint.proceed()`.
+5. **@After**: Executes regardless of outcome (Success or Exception).
+6. **@AfterReturning**: (Success only) Captures the result.
+7. **@AfterThrowing**: (Exception only) Captures the error.
+---
+
 ## How to Test
 
 1.  **Success Path**: Run the application to see `addEmployee` and `deleteEmployee` logs. Observe how `@Around` wraps the execution.
@@ -72,6 +85,7 @@ The project uses `aspectjweaver` to enable proxy-based AOP. The `@EnableAspectJA
 
 ## Output Sample
 ```
+--- TEST 1: SUCCESS SCENARIO (VOID METHOD) ---
 [Around-Before] Method: addEmployee
 Before method: addEmployee
 Adding employee: Ram
@@ -79,6 +93,16 @@ Adding employee: Ram
 After method: addEmployee
 [Around-AfterReturning] Method: addEmployee
 [Around-After] Method: addEmployee
+
+--- TEST 2: SUCCESS SCENARIO (RETURN VALUE) ---
+[Around-Before] Method: checkStatus
+Before method: checkStatus
+Checking status for: EMP101
+[AfterReturning] Method: checkStatus returned: Active
+After method: checkStatus
+[Around-AfterReturning] Method: checkStatus
+[Around-After] Method: checkStatus
+MainApp received status: Active
 [Around-Before] Method: deleteEmployee
 Before method: deleteEmployee
 Deleting employee: Ram
@@ -86,6 +110,8 @@ Deleting employee: Ram
 After method: deleteEmployee
 [Around-AfterReturning] Method: deleteEmployee
 [Around-After] Method: deleteEmployee
+
+--- TEST 3: EXCEPTION SCENARIO ---
 [Around-Before] Method: throwError
 Before method: throwError
 [AfterThrowing] Method: throwError throw exception: java.lang.RuntimeException: Simulated exception in EmployeeService
@@ -94,4 +120,5 @@ After method: throwError
 Caught exception in MainApp: Simulated exception in EmployeeService
 
 Process finished with exit code 0
+
 ```

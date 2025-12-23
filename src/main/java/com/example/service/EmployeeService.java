@@ -25,5 +25,9 @@ public class EmployeeService {
     }
 
 
-
+    // method for returning value
+    public String checkStatus(String empId){
+        System.out.println("Checking status for: " + empId);
+        return "Active";
+    }
 }
